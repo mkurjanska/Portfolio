@@ -1,0 +1,8 @@
+requests
+beautifulsoup4
+cloudscraper
+duckduckgo-search
+pdfplumber
+playwright
+playwright-stealth
+selenium

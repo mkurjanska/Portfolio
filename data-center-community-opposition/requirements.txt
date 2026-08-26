@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+geopandas
+shapely
+openpyxl
+matplotlib
+
+# to open/run the notebooks themselves
+jupyter
+nbformat

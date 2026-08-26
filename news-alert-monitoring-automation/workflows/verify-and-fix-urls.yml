@@ -1,0 +1,43 @@
+name: Verify and Fix County URLs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 1 * *'   # Monthly re-verification
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  verify-urls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull LFS files
+        run: git lfs pull
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify and fix URLs
+        working-directory: News_Alerts
+        run: python verify_and_fix_urls.py
+
+      - name: Commit results
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git add News_Alerts/county_urls.csv
+          git diff --cached --quiet || git commit -m "Verify and fix county URLs $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push

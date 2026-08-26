@@ -1,0 +1,59 @@
+# .github/workflows/process_alerts.yml
+#
+# Runs Monday and Thursday, or on manual dispatch. Diffs against HEAD~1 to find
+# rows fetch_alerts.yml has added to alerts.csv since the last run.
+# Runs keyword-based analysis (Mode B) by default.
+# Set ANTHROPIC_API_KEY secret to enable Claude AI analysis (Mode A).
+name: Process News Alerts
+
+on:
+  schedule:
+    - cron: '0 20 * * 4'  
+    - cron: '0 20 * * 1'   
+    
+  workflow_dispatch:
+
+jobs:
+  analyze-alerts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # to commit output files back to the repo
+      issues: write     # to open GitHub Issues
+
+    steps:
+      - name: Install Git LFS
+        run: |
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2      # need HEAD and HEAD~1 to compute the git diff
+          lfs: true           # download actual LFS file content, not pointers
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install feedparser requests beautifulsoup4 lxml
+
+      - name: Run alert processor
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO:  ${{ github.repository }}
+          # Uncomment the line below once you add your Anthropic API key
+          # as a repo secret named ANTHROPIC_API_KEY to enable AI analysis:
+          # ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python News_Alerts/process_alerts.py
+
+      - name: Commit output files
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add News_Alerts/
+          git diff --cached --quiet || git commit -m "chore: auto-update alert outputs [skip ci]"
+          git pull --rebase origin main
+          git push

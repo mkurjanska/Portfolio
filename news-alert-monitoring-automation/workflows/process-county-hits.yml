@@ -1,0 +1,60 @@
+name: Process County Hits
+
+on:
+  push:
+    paths:
+      - 'News_Alerts/county_meeting_hits.csv'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  process-hits:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull LFS files
+        run: git lfs pull
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Process county hits
+        working-directory: News_Alerts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python process_county_hits.py
+
+      - name: Commit results
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          [ -f News_Alerts/index_county_scrape.csv ] && git add News_Alerts/index_county_scrape.csv || true
+          [ -f News_Alerts/county_hits_report.csv  ] && git add News_Alerts/county_hits_report.csv  || true
+          [ -f News_Alerts/processed_hits.txt      ] && git add News_Alerts/processed_hits.txt      || true
+          [ -d News_Alerts/scraped_hits             ] && git add News_Alerts/scraped_hits/           || true
+          git diff --cached --quiet || git commit -m "County hits processed $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main

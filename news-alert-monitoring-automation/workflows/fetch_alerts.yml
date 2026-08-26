@@ -1,0 +1,40 @@
+name: Fetch Data Center Alerts
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # Fixes the Node.js warning
+jobs:
+  fetch-alerts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install feedparser requests beautifulsoup4 lxml
+
+      - name: Fetch RSS and save to CSV
+        env:
+          DATA_CENTER_ALERT_RSS_URL: ${{ secrets.DATA_CENTER_ALERT_RSS_URL }}
+          TALKWALKER_RSS_URL: ${{ secrets.TALKWALKER_RSS_URL }}
+        run: python News_Alerts/fetch_alerts.py
+
+      - name: Commit and push results
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git add News_Alerts/alerts.csv
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update alerts $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git pull origin main --no-rebase --no-edit
+          git push
