@@ -113,7 +113,7 @@ IZ_HARD_TERMS = [
 # This is the PRIMARY search backend when a key is set. The script will ask
 # at startup whether to keep this key or paste a new one for this run.
 # Sign up at https://scrapingbee.com
-SCRAPINGBEE_API_KEY = ""   # ← paste your key here, e.g. "abc123..."
+SCRAPINGBEE_API_KEY = ""   # ← paste your key here
 
 # Serper.dev — free tier: 2,500 searches on signup, no credit card needed.
 # Sign up at https://serper.dev, copy your API key here.
