@@ -1,6 +1,6 @@
 # Portfolio
 
-I am a data analyst and researcher building data products at LocalQ Labs, an early-stage startup mapping and predicting community opposition to data center development across U.S. markets. These projects are the actual pipeline, modelling, and monitoring code from that work — written to run in production, not as exercises.
+I am a data analyst and researcher building data products at LocalQ Labs, an early-stage startup mapping and predicting community opposition to data center development across U.S. markets. These projects are the actual- redacted- pipeline, modelling, and monitoring code from that work.
 
 Each folder is self-contained: a README with context, code/notebooks, and a `requirements.txt` for what it actually imports. No proprietary or raw data is included anywhere in this repo — where a project needs data to be meaningful, the README says so and points to the source project instead.
 
