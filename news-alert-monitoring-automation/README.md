@@ -1,6 +1,6 @@
 # News Alert & County Meeting Monitoring Automation
 
-A maintained, cron-scheduled monitoring system (GitHub Actions) that tracks data center news coverage and county government meeting activity, rather than a one-off scraping script. In continuous unattended operation since June 2026. News monitoring covers 408 curated local outlets plus 22 dedicated trade/watchdog sources, and has processed 20,000+ alerts to date; county meeting monitoring covers 2,247 county source URLs. Part of the data center opposition project.
+A maintained, cron-scheduled monitoring system (GitHub Actions) that tracks data center news coverage and county government meeting activity. In continuous unattended operation since June 2026. News monitoring covers 408 curated local outlets plus 22 dedicated trade/watchdog sources, and has processed 20,000+ alerts to date; county meeting monitoring covers 2,247 county source URLs. Part of the data center opposition project.
 
 No scraped output data is included — code and workflow configuration only.
 
@@ -17,4 +17,4 @@ No scraped output data is included — code and workflow configuration only.
 
 ## Why this is here
 
-Most scraping code shown in a portfolio is a script that ran once. This is a system that runs unattended on a schedule, handles its own dedup and URL rot, and commits its own results — the kind of thing that has to keep working without anyone watching it.
+Most scraping code shown in a portfolio is a script that ran once. This is an automated system that runs unattended on a schedule, handles its own dedup and URL rot, and commits its own results.
